@@ -1,6 +1,9 @@
-from dynamicprompts.generators import CombinatorialPromptGenerator
+import random
 
-from .. import wildcards as _wildcards
+from src import wildcards as _wildcards
+from src.evaluator.context import EvaluationContext
+from src.evaluator.combinatorial_eval import evaluate_all
+from src.parser.parser import parse
 
 
 class DynamicPromptCombinatorial:
@@ -22,8 +25,12 @@ class DynamicPromptCombinatorial:
     def generate(self, template: str, index: int) -> tuple[str, list[str], int]:
         if not template.strip():
             return ("", [], 0)
-        generator = CombinatorialPromptGenerator(wildcard_manager=_wildcards.get_wildcard_manager())
-        results = generator.generate(template)
+        ast = parse(template)
+        ctx = EvaluationContext(
+            rng=random.Random(0),
+            wildcard_manager=_wildcards.get_wildcard_manager(),
+        )
+        results = evaluate_all(ast, ctx)
         if not results:
             return ("", [], 0)
         prompt = results[index % len(results)]

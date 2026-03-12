@@ -1,6 +1,9 @@
-from dynamicprompts.generators import RandomPromptGenerator
+import random
 
-from .. import wildcards as _wildcards
+from src import wildcards as _wildcards
+from src.evaluator.context import EvaluationContext
+from src.evaluator.random_eval import evaluate
+from src.parser.parser import parse
 
 
 class DynamicPromptRandom:
@@ -25,9 +28,12 @@ class DynamicPromptRandom:
     def generate(self, template: str, seed: int) -> tuple[str]:
         if not template.strip():
             return ("",)
-        generator = RandomPromptGenerator(wildcard_manager=_wildcards.get_wildcard_manager(), seed=seed)
-        results = generator.generate(template)
-        return (results[0] if results else "",)
+        ast = parse(template)
+        ctx = EvaluationContext(
+            rng=random.Random(seed),
+            wildcard_manager=_wildcards.get_wildcard_manager(),
+        )
+        return (evaluate(ast, ctx),)
 
 
 NODE_CLASS_MAPPINGS = {"DynamicPromptRandom": DynamicPromptRandom}

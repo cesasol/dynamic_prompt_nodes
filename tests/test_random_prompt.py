@@ -20,6 +20,14 @@ def test_wildcard_resolution() -> None:
     assert result in {"cat", "dog", "bird"}
 
 
+def test_variable_in_prompt() -> None:
+    node = random_module.DynamicPromptRandom()
+    (result,) = node.generate("${x=!{a|b}} ${x} ${x}", seed=0)
+    words = result.split()
+    assert len(words) == 2
+    assert words[0] == words[1]
+
+
 def test_empty_template() -> None:
     node = random_module.DynamicPromptRandom()
     (result,) = node.generate("", seed=0)
