@@ -89,37 +89,28 @@ class _Transformer(Transformer):  # type: ignore[misc]
     def sampler_cyclical(self, _: list[Any]) -> "_SamplerMarker":
         return _SamplerMarker("cyclical")
 
-    def count_spec(self, items: list[Any]) -> "_CountSpec":
+    def count_with_sep(self, items: list[Any]) -> "_CountSpec":
         count_range = items[0]
-        sep = ", "
-        for item in items[1:]:
-            if isinstance(item, str):
-                sep = item
-        return _CountSpec(
-            min_count=count_range[0],
-            max_count=count_range[1],
-            separator=sep,
-        )
+        sep = str(items[1])
+        return _CountSpec(min_count=count_range[0], max_count=count_range[1], separator=sep)
 
-    def exact_count(self, items: list[Any]) -> tuple[int, int]:
+    def count_only(self, items: list[Any]) -> "_CountSpec":
+        count_range = items[0]
+        return _CountSpec(min_count=count_range[0], max_count=count_range[1], separator=", ")
+
+    def range_lo_hi(self, items: list[Any]) -> tuple[int, int]:
+        return (int(items[0]), int(items[1]))
+
+    def range_lo(self, items: list[Any]) -> tuple[int, int]:
         n = int(items[0])
         return (n, n)
 
-    def range_count(self, items: list[Any]) -> tuple[int, int]:
-        raw = "".join(str(t) for t in items)
-        if raw.startswith("-"):
-            return (1, int(raw[1:]) if raw[1:] else 1)
-        if raw.endswith("-"):
-            n = int(raw[:-1])
-            return (n, n)
-        lo, hi = raw.split("-")
-        return (int(lo), int(hi))
+    def range_hi(self, items: list[Any]) -> tuple[int, int]:
+        return (1, int(items[0]))
 
-    def sep_spec(self, items: list[Any]) -> str:
-        return str(items[0]) if items else ", "
-
-    def separator_text(self, items: list[Any]) -> str:
-        return str(items[0]) if items else ""
+    def range_single(self, items: list[Any]) -> tuple[int, int]:
+        n = int(items[0])
+        return (n, n)
 
     def weighted_option(self, items: list[Any]) -> WeightedOption:
         return WeightedOption(weight=float(items[0]), node=items[1])

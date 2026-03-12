@@ -13,6 +13,7 @@ template: part*
 
 // Plain text: any character that doesn't start a special construct.
 // Single _ is fine; __ starts a wildcard. Single $ is fine; ${ starts a variable.
+// | excluded globally (variant separator); {}_$# also excluded.
 TEXT: /(?:_(?!_)|\$(?!\{)|[^{}_$#|])+/
 
 // Comments: # to end of line, stripped from output
@@ -27,14 +28,18 @@ sampler_pfx: "~"  -> sampler_random
            | "@"  -> sampler_cyclical
 
 // Count spec: N$$, N-M$$, -M$$, N-$$, with optional custom separator
-count_spec: count_range _WS? sep_spec? "$$" _WS?
-?count_range: exact_count | range_count
-exact_count: INT
-range_count: INT? "-" INT?
+count_spec: count_range "$$" SEPARATOR_TEXT "$$" _WS?  -> count_with_sep
+          | count_range "$$" _WS?                       -> count_only
 
-// Custom separator between two $$: {2$$ and $$a|b}
-sep_spec: separator_text "$$"
-separator_text: /(?:[^$}|{]|\$(?!\$))+/
+?count_range: range_lo_hi | range_lo | range_hi | range_single
+range_lo_hi: INT "-" INT
+range_lo:    INT "-"
+range_hi:    "-" INT
+range_single: INT
+
+// Separator text between two $$: {2$$ and $$a|b}
+// Matches any char except $}|{ or a lone $ not before $
+SEPARATOR_TEXT: /(?:[^$}|{]|\$(?!\$))+/
 
 // Option: optional weight, then a template
 option: NUMBER "::" _WS? template  -> weighted_option
