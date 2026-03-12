@@ -1,11 +1,11 @@
 import random
 import pytest
 from pathlib import Path
-from dynamicprompts.wildcards import WildcardManager
 
 from src.evaluator.context import EvaluationContext
 from src.evaluator.cyclical_eval import evaluate
 from src.parser.parser import parse
+from src.wildcards import WildcardManager
 
 
 @pytest.fixture
@@ -15,7 +15,7 @@ def make_ctx(wildcards_path: Path):  # type: ignore[no-untyped-def]
     def _make() -> EvaluationContext:
         return EvaluationContext(
             rng=random.Random(0),
-            wildcard_manager=WildcardManager(path=wildcards_path),
+            wildcard_manager=WildcardManager(paths=[wildcards_path]),
             cycle_counters=counters,  # shared across calls
         )
 

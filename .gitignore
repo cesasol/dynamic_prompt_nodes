@@ -113,3 +113,7 @@ node.zip
 .vscode/
 .claude/
 .worktrees/
+
+# User wildcard files (not bundled with the package)
+/*.yaml
+wildcards/*.yaml

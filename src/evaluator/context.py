@@ -1,14 +1,13 @@
 from __future__ import annotations
 import random
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Protocol
-
-from dynamicprompts.wildcards import WildcardManager
+from typing import Iterable, Protocol
 
 from src.parser.ast_nodes import Template
 
-if TYPE_CHECKING:
-    pass
+
+class WildcardProvider(Protocol):
+    def get_all_values(self, wildcard: str) -> Iterable[str]: ...
 
 
 class Evaluator(Protocol):
@@ -18,7 +17,7 @@ class Evaluator(Protocol):
 @dataclass
 class EvaluationContext:
     rng: random.Random
-    wildcard_manager: WildcardManager
+    wildcard_manager: WildcardProvider
     variables: dict[str, Template] = field(default_factory=dict)  # non-immediate: AST
     resolved: dict[str, str] = field(default_factory=dict)  # immediate: already evaluated
     cycle_counters: dict[str, int] = field(default_factory=dict)  # cyclical sampler state

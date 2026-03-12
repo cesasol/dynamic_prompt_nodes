@@ -1,8 +1,6 @@
 from __future__ import annotations
 import random
 
-from dynamicprompts.wildcards import WildcardManager
-
 from src.evaluator.context import EvaluationContext
 from src.parser.ast_nodes import Template, Text, Variant, Wildcard, Variable
 from src.parser import parser as _parser_mod
@@ -11,7 +9,9 @@ from src.parser import parser as _parser_mod
 def evaluate_all(template: Template, ctx: EvaluationContext | None = None) -> list[str]:
     """Enumerate all possible prompt strings from a template."""
     if ctx is None:
-        ctx = EvaluationContext(rng=random.Random(0), wildcard_manager=WildcardManager())
+        from src.wildcards import get_wildcard_manager
+
+        ctx = EvaluationContext(rng=random.Random(0), wildcard_manager=get_wildcard_manager())
     return [text for _, text in _expand(template, ctx)]
 
 

@@ -1,18 +1,18 @@
 import pytest
 from pathlib import Path
-from dynamicprompts.wildcards import WildcardManager
 import random
 
 from src.evaluator.context import EvaluationContext
 from src.evaluator.combinatorial_eval import evaluate_all
 from src.parser.parser import parse
+from src.wildcards import WildcardManager
 
 
 @pytest.fixture
 def ctx(wildcards_path: Path) -> EvaluationContext:
     return EvaluationContext(
         rng=random.Random(0),
-        wildcard_manager=WildcardManager(path=wildcards_path),
+        wildcard_manager=WildcardManager(paths=[wildcards_path]),
     )
 
 
