@@ -9,6 +9,12 @@ from src.parser.parser import parse
 
 class DynamicPromptCyclical:
     CATEGORY = "Dynamic Prompts"
+    DESCRIPTION = (
+        "Evaluates a dynamic prompt template by cycling through options in order. "
+        "Variants like {a|b|c} advance one step per execution — first run gives a, second b, third c, then wraps back to a. "
+        "Useful for iterating through a fixed sequence of prompts across a batch. "
+        "Counters reset automatically when the template changes."
+    )
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("prompt",)
     FUNCTION = "generate"

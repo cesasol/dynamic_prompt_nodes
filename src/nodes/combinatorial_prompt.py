@@ -8,6 +8,13 @@ from src.parser.parser import parse
 
 class DynamicPromptCombinatorial:
     CATEGORY = "Dynamic Prompts"
+    DESCRIPTION = (
+        "Generates every possible combination from a dynamic prompt template. "
+        "Variants like {a|b} are expanded exhaustively — {a|b} {x|y} produces a x, a y, b x, b y. "
+        "Wildcards like __colours__ insert every value from the wildcard file. "
+        "Outputs the full list of prompts, the total count, and the single prompt at the given index "
+        "(wraps around if index exceeds total)."
+    )
     RETURN_TYPES = ("STRING", "STRING", "INT")
     RETURN_NAMES = ("prompt", "all_prompts", "total_count")
     OUTPUT_IS_LIST = (False, True, False)

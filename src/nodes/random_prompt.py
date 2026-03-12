@@ -8,6 +8,13 @@ from src.parser.parser import parse
 
 class DynamicPromptRandom:
     CATEGORY = "Dynamic Prompts"
+    DESCRIPTION = (
+        "Evaluates a dynamic prompt template using random sampling. "
+        "Variants like {cat|dog|bird} pick one option at random. "
+        "Wildcards like __animals__ are resolved from wildcard files. "
+        "The seed controls reproducibility — the same seed always produces the same output. "
+        "Optionally append a wildcard from the dropdown to the template before evaluation."
+    )
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("prompt",)
     FUNCTION = "generate"
