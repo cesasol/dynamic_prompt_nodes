@@ -45,7 +45,7 @@ def _expand_node(
         return _expand_wildcard(node, ctx)
     if isinstance(node, Variable):
         return _expand_variable(node, ctx)
-    return [(ctx, "")]
+    raise AssertionError(f"Unexpected node type: {type(node)}")
 
 
 def _expand_variant(v: Variant, ctx: EvaluationContext) -> list[tuple[EvaluationContext, str]]:
@@ -60,6 +60,7 @@ def _expand_variant(v: Variant, ctx: EvaluationContext) -> list[tuple[Evaluation
 
 def _expand_wildcard(w: Wildcard, ctx: EvaluationContext) -> list[tuple[EvaluationContext, str]]:
     from src.evaluator.random_eval import _resolve_pattern
+
     pattern = _resolve_pattern(w.pattern, ctx)
     values = list(ctx.wildcard_manager.get_all_values(pattern))
     if not values:
@@ -72,9 +73,7 @@ def _expand_wildcard(w: Wildcard, ctx: EvaluationContext) -> list[tuple[Evaluati
     return results
 
 
-def _expand_variable(
-    v: Variable, ctx: EvaluationContext
-) -> list[tuple[EvaluationContext, str]]:
+def _expand_variable(v: Variable, ctx: EvaluationContext) -> list[tuple[EvaluationContext, str]]:
     if v.value is not None:
         if v.immediate:
             # Each branch of the value gets its own forked context with x fixed.

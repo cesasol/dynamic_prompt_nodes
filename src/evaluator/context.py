@@ -19,9 +19,9 @@ class Evaluator(Protocol):
 class EvaluationContext:
     rng: random.Random
     wildcard_manager: WildcardManager
-    variables: dict[str, Template] = field(default_factory=dict)   # non-immediate: AST
-    resolved: dict[str, str] = field(default_factory=dict)         # immediate: already evaluated
-    cycle_counters: dict[str, int] = field(default_factory=dict)   # cyclical sampler state
+    variables: dict[str, Template] = field(default_factory=dict)  # non-immediate: AST
+    resolved: dict[str, str] = field(default_factory=dict)  # immediate: already evaluated
+    cycle_counters: dict[str, int] = field(default_factory=dict)  # cyclical sampler state
 
     def get_variable(self, name: str, default: Template | None, evaluator: Evaluator) -> str:
         """Resolve a variable reference: resolved → variables → default → error."""

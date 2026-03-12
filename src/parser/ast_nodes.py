@@ -14,6 +14,7 @@ class Text:
 @dataclass
 class Template:
     """A sequence of nodes forming a complete template or sub-expression."""
+
     parts: list[Text | Variant | Wildcard | Variable]
 
 
@@ -42,6 +43,6 @@ class Wildcard:
 @dataclass
 class Variable:
     name: str
-    value: Template | None        # None = read-only reference
-    immediate: bool               # True when ${name=!...}
-    default: Template | None      # for ${name:default}
+    value: Template | None  # None = read-only reference
+    immediate: bool  # True when ${name=!...}
+    default: Template | None  # for ${name:default}

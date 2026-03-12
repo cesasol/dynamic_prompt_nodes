@@ -18,6 +18,7 @@ def make_ctx(wildcards_path: Path):  # type: ignore[no-untyped-def]
             wildcard_manager=WildcardManager(path=wildcards_path),
             cycle_counters=counters,  # shared across calls
         )
+
     return _make
 
 

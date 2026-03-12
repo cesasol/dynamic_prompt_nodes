@@ -22,7 +22,7 @@ def _eval_node(node: Text | Variant | Wildcard | Variable, ctx: EvaluationContex
         return _eval_wildcard(node, ctx)
     if isinstance(node, Variable):
         return _eval_variable(node, ctx)
-    return ""
+    raise AssertionError(f"Unexpected node type: {type(node)}")
 
 
 def _eval_variant(v: Variant, ctx: EvaluationContext) -> str:
@@ -38,6 +38,7 @@ def _eval_variant(v: Variant, ctx: EvaluationContext) -> str:
 
 def _eval_wildcard(w: Wildcard, ctx: EvaluationContext) -> str:
     from src.evaluator.random_eval import _resolve_pattern
+
     pattern = _resolve_pattern(w.pattern, ctx)
     values = sorted(ctx.wildcard_manager.get_all_values(pattern))
     if not values:
@@ -51,6 +52,7 @@ def _eval_wildcard(w: Wildcard, ctx: EvaluationContext) -> str:
 
 def _eval_variable(v: Variable, ctx: EvaluationContext) -> str:
     from src.evaluator.random_eval import evaluate as random_evaluate
+
     if v.value is not None:
         if v.immediate:
             value_str = random_evaluate(v.value, ctx)

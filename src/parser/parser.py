@@ -1,8 +1,8 @@
 from __future__ import annotations
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal, cast
 
-from lark import Lark, Transformer, v_args
+from lark import Lark, Transformer
 
 from src.parser.ast_nodes import (
     Template,
@@ -22,16 +22,17 @@ def parse(template_str: str) -> Template:
     if not template_str:
         return Template(parts=[])
     tree = _parser.parse(template_str)
-    return _Transformer().transform(tree)
+    result: Template = _Transformer().transform(tree)
+    return result
 
 
-class _Transformer(Transformer):  # type: ignore[misc]
-
+class _Transformer(Transformer):  # type: ignore[type-arg]
     def start(self, items: list[Any]) -> Template:
-        return items[0]
+        result: Template = items[0]
+        return result
 
     def template(self, items: list[Any]) -> Template:
-        parts = []
+        parts: list[Text | Variant | Wildcard | Variable] = []
         for item in items:
             if item is None:
                 continue
@@ -59,7 +60,7 @@ class _Transformer(Transformer):  # type: ignore[misc]
     # --- Variants ---
 
     def variant(self, items: list[Any]) -> Variant:
-        sampler = "random"
+        sampler: Literal["random", "combinatorial", "cyclical"] = "random"
         min_count = 1
         max_count = 1
         separator = ", "
@@ -67,7 +68,7 @@ class _Transformer(Transformer):  # type: ignore[misc]
 
         for item in items:
             if isinstance(item, _SamplerMarker):
-                sampler = item.name
+                sampler = cast(Literal["random", "combinatorial", "cyclical"], item.name)
             elif isinstance(item, _CountSpec):
                 min_count = item.min_count
                 max_count = item.max_count
@@ -121,13 +122,13 @@ class _Transformer(Transformer):  # type: ignore[misc]
     # --- Wildcards ---
 
     def wildcard(self, items: list[Any]) -> Wildcard:
-        sampler = "random"
+        sampler: Literal["random", "combinatorial", "cyclical"] = "random"
         pattern = ""
         params: dict[str, str] = {}
 
         for item in items:
             if isinstance(item, _SamplerMarker):
-                sampler = item.name
+                sampler = cast(Literal["random", "combinatorial", "cyclical"], item.name)
             elif isinstance(item, str):
                 pattern = item
             elif isinstance(item, dict):

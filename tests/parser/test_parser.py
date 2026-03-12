@@ -1,6 +1,5 @@
-import pytest
 from src.parser.parser import parse
-from src.parser.ast_nodes import Template, Text, Variant, WeightedOption, Wildcard, Variable
+from src.parser.ast_nodes import Template, Text, Variant, Wildcard, Variable
 
 
 def test_plain_text():
@@ -120,6 +119,7 @@ def test_variant_with_whitespace():
 
 # --- Wildcards ---
 
+
 def test_basic_wildcard():
     result = parse("__season__")
     assert len(result.parts) == 1
@@ -168,6 +168,7 @@ def test_wildcard_in_text():
 
 
 # --- Variables ---
+
 
 def test_variable_reference():
     result = parse("${name}")
@@ -223,6 +224,7 @@ def test_variable_reuse():
 
 
 # --- Comments ---
+
 
 def test_comment_stripped():
     result = parse("# this is a comment\n{a|b}")

@@ -19,7 +19,7 @@ def _eval_node(node: Text | Variant | Wildcard | Variable, ctx: EvaluationContex
         return _eval_wildcard(node, ctx)
     if isinstance(node, Variable):
         return _eval_variable(node, ctx)
-    return ""
+    raise AssertionError(f"Unexpected node type: {type(node)}")
 
 
 def _eval_variant(v: Variant, ctx: EvaluationContext) -> str:
@@ -41,9 +41,7 @@ def _eval_variant(v: Variant, ctx: EvaluationContext) -> str:
     return v.separator.join(values)
 
 
-def _weighted_sample_no_replacement(
-    weights: list[float], k: int, rng: random.Random
-) -> list[int]:
+def _weighted_sample_no_replacement(weights: list[float], k: int, rng: random.Random) -> list[int]:
     """Sample k indices without replacement using given weights."""
     remaining = list(range(len(weights)))
     remaining_weights = list(weights)
@@ -79,12 +77,14 @@ def _eval_wildcard(w: Wildcard, ctx: EvaluationContext) -> str:
         result = ctx.rng.choice(values)
     # Wildcard values can themselves be templates — parse and evaluate
     from src.parser.parser import parse as parse_template
+
     return evaluate(parse_template(result), ctx)
 
 
 def _resolve_pattern(pattern: str, ctx: EvaluationContext) -> str:
     """Substitute ${var} references in a wildcard path pattern."""
     import re
+
     def replace(m: re.Match[str]) -> str:
         name = m.group(1)
         if name in ctx.resolved:
@@ -92,6 +92,7 @@ def _resolve_pattern(pattern: str, ctx: EvaluationContext) -> str:
         if name in ctx.variables:
             return evaluate(ctx.variables[name], ctx)
         return m.group(0)  # leave unresolved
+
     return re.sub(r"\$\{([a-zA-Z_][a-zA-Z0-9_]*)\}", replace, pattern)
 
 

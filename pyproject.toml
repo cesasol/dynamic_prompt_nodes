@@ -58,7 +58,7 @@ testpaths = [
 pythonpath = ["."]
 
 [tool.mypy]
-files = "."
+files = ["src"]
 
 # Use strict defaults
 strict = true

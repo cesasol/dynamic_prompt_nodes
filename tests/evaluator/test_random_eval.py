@@ -35,7 +35,10 @@ def test_same_seed_reproducible() -> None:
 
 def test_weighted_variant() -> None:
     # Weight 0 means never picked
-    results = {evaluate(parse("{1000::always|0::never}"), EvaluationContext(rng=random.Random(i), wildcard_manager=WildcardManager())) for i in range(20)}
+    results = {
+        evaluate(parse("{1000::always|0::never}"), EvaluationContext(rng=random.Random(i), wildcard_manager=WildcardManager()))
+        for i in range(20)
+    }
     assert "always" in results
     assert "never" not in results
 
