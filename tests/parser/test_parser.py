@@ -167,6 +167,20 @@ def test_wildcard_in_text():
     assert isinstance(result.parts[1], Wildcard)
 
 
+def test_wildcard_with_spaces_in_name():
+    result = parse("__key with spaces__")
+    w = result.parts[0]
+    assert isinstance(w, Wildcard)
+    assert w.pattern == "key with spaces"
+
+
+def test_wildcard_with_spaces_in_path():
+    result = parse("__my category/key with spaces__")
+    w = result.parts[0]
+    assert isinstance(w, Wildcard)
+    assert w.pattern == "my category/key with spaces"
+
+
 # --- Variables ---
 
 
