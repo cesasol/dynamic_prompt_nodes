@@ -1,4 +1,4 @@
-import dynamic_prompt_nodes.src.nodes.combinatorial_prompt as combinatorial_module
+import src.nodes.combinatorial_prompt as combinatorial_module
 
 
 def test_index_0() -> None:
