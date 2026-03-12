@@ -117,3 +117,4 @@ node.zip
 # User wildcard files (not bundled with the package)
 /*.yaml
 wildcards/*.yaml
+!wildcards/example.yaml

@@ -1,0 +1,64 @@
+# Example wildcard file — demonstrates all supported reference patterns.
+#
+# Reference any key with __example/<key>__ in your prompt.
+# Glob patterns work too: __example/style/*__ matches all style sub-keys.
+
+# --- Flat list -----------------------------------------------------------------
+# Usage: __example/subject__
+subject:
+  - a lone astronaut
+  - an ancient wizard
+  - a street photographer
+  - a mechanical dragon
+  - a deep-sea diver
+
+# --- Single-level nesting ------------------------------------------------------
+# Usage: __example/style/lighting__  or  __example/style/mood__
+style:
+  lighting:
+    - golden hour sunlight
+    - dramatic rim lighting
+    - soft overcast diffusion
+    - neon glow from below
+    - candlelight
+  mood:
+    - melancholic and quiet
+    - tense and electric
+    - serene and timeless
+    - chaotic and overwhelming
+    - warm and nostalgic
+  medium:
+    - oil painting
+    - watercolor sketch
+    - hyper-realistic 3D render
+    - ink wash illustration
+    - film photograph, grain
+
+# --- Two-level nesting ---------------------------------------------------------
+# Usage: __example/environment/outdoor/natural__
+environment:
+  outdoor:
+    natural:
+      - misty mountain forest
+      - sun-bleached desert dunes
+      - rugged coastal cliffs at dusk
+    urban:
+      - rain-soaked city street at midnight
+      - rooftop garden above the skyline
+      - abandoned industrial yard
+  indoor:
+    - cathedral interior with dust motes
+    - cluttered Victorian study
+    - sterile server room
+    - cozy ramen shop, steam rising
+
+# --- Used in a full prompt example --------------------------------------------
+# Try this template in the Random or Combinatorial node:
+#
+#   Portrait of __example/subject__, set in __example/environment/outdoor/natural__,
+#   __example/style/lighting__, rendered as __example/style/medium__
+#
+# Or with variables to lock the mood across the whole prompt:
+#
+#   ${mood=!__example/style/mood__}
+#   __example/subject__, ${mood}, __example/style/lighting__ that feels ${mood}
