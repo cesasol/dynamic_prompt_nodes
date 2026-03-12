@@ -2,7 +2,7 @@ import pytest
 from pathlib import Path
 from dynamicprompts.wildcards import WildcardManager
 
-import src.wildcards as wildcards_mod
+import dynamic_prompt_nodes.src.wildcards as wildcards_mod
 
 
 @pytest.fixture

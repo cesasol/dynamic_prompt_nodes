@@ -1,4 +1,4 @@
-import src.nodes.random_prompt as random_module
+import dynamic_prompt_nodes.src.nodes.random_prompt as random_module
 
 
 def test_variant_produces_valid_result() -> None:
