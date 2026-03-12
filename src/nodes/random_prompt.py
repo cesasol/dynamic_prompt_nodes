@@ -18,14 +18,17 @@ class DynamicPromptRandom:
             "required": {
                 "template": ("STRING", {"multiline": True}),
                 "seed": ("INT", {"default": 0, "min": 0, "max": 2**31 - 1}),
+                "wildcard_append": (_wildcards.wildcard_choices(),),
             }
         }
 
     @classmethod
-    def IS_CHANGED(cls, template: str, seed: int) -> int:
+    def IS_CHANGED(cls, template: str, seed: int, wildcard_append: str) -> int:
         return seed
 
-    def generate(self, template: str, seed: int) -> tuple[str]:
+    def generate(self, template: str, seed: int, wildcard_append: str = "-- none --") -> tuple[str]:
+        if wildcard_append != "-- none --":
+            template = template + " __" + wildcard_append + "__"
         if not template.strip():
             return ("",)
         ast = parse(template)

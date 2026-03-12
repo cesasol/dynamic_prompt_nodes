@@ -25,3 +25,15 @@ def test_plain_text() -> None:
     (r2,) = node.generate("hello")
     assert r1 == "hello"
     assert r2 == "hello"
+
+
+def test_wildcard_append_appends_syntax() -> None:
+    node = cyclical_module.DynamicPromptCyclical()
+    (result,) = node.generate("a", wildcard_append="animals")
+    assert result in {"a cat", "a dog", "a bird"}
+
+
+def test_wildcard_append_none_sentinel() -> None:
+    node = cyclical_module.DynamicPromptCyclical()
+    (result,) = node.generate("hello", wildcard_append="-- none --")
+    assert result == "hello"

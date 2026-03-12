@@ -23,14 +23,17 @@ class DynamicPromptCyclical:
         return {
             "required": {
                 "template": ("STRING", {"multiline": True}),
+                "wildcard_append": (_wildcards.wildcard_choices(),),
             }
         }
 
     @classmethod
-    def IS_CHANGED(cls, template: str) -> float:
+    def IS_CHANGED(cls, template: str, wildcard_append: str) -> float:
         return float("nan")  # always re-execute
 
-    def generate(self, template: str) -> tuple[str]:
+    def generate(self, template: str, wildcard_append: str = "-- none --") -> tuple[str]:
+        if wildcard_append != "-- none --":
+            template = template + " __" + wildcard_append + "__"
         if not template.strip():
             return ("",)
         # Re-parse only when template changes; reset counters so the cycle restarts

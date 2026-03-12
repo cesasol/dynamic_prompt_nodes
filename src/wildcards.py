@@ -80,12 +80,19 @@ class WildcardManager:
             elif isinstance(value, dict):
                 yield from self._flatten_dict(value, prefix=full_key)
 
+    def list_names(self) -> list[str]:
+        return sorted(self._index.keys())
+
     def get_all_values(self, wildcard: str) -> list[str]:
         results: list[str] = []
         for name, values in self._index.items():
             if fnmatch(name, wildcard):
                 results.extend(values)
         return results
+
+
+def wildcard_choices() -> list[str]:
+    return ["-- none --"] + get_wildcard_manager().list_names()
 
 
 def get_wildcard_manager() -> WildcardManager:

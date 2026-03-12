@@ -19,10 +19,13 @@ class DynamicPromptCombinatorial:
             "required": {
                 "template": ("STRING", {"multiline": True}),
                 "index": ("INT", {"default": 0, "min": 0, "max": 2**31 - 1}),
+                "wildcard_append": (_wildcards.wildcard_choices(),),
             }
         }
 
-    def generate(self, template: str, index: int) -> tuple[str, list[str], int]:
+    def generate(self, template: str, index: int, wildcard_append: str = "-- none --") -> tuple[str, list[str], int]:
+        if wildcard_append != "-- none --":
+            template = template + " __" + wildcard_append + "__"
         if not template.strip():
             return ("", [], 0)
         ast = parse(template)

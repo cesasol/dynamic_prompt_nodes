@@ -31,3 +31,16 @@ def test_empty_template() -> None:
     node = combinatorial_module.DynamicPromptCombinatorial()
     result = node.generate("", index=0)
     assert result == ("", [], 0)
+
+
+def test_wildcard_append_appends_syntax() -> None:
+    node = combinatorial_module.DynamicPromptCombinatorial()
+    prompt, all_prompts, total = node.generate("{a|b}", index=0, wildcard_append="animals")
+    assert total == 6  # 2 variants × 3 animals
+    assert all(p.split()[1] in {"cat", "dog", "bird"} for p in all_prompts)
+
+
+def test_wildcard_append_none_sentinel() -> None:
+    node = combinatorial_module.DynamicPromptCombinatorial()
+    _, _, total = node.generate("{a|b}", index=0, wildcard_append="-- none --")
+    assert total == 2
