@@ -54,6 +54,7 @@ minversion = "8.0"
 testpaths = [
     "tests",
 ]
+pythonpath = ["."]
 
 [tool.mypy]
 files = "."

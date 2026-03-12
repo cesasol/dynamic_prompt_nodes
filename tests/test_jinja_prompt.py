@@ -1,4 +1,4 @@
-import dynamic_prompt_nodes.src.nodes.jinja_prompt as jinja_module
+import src.nodes.jinja_prompt as jinja_module
 
 
 def test_jinja_expression() -> None:
