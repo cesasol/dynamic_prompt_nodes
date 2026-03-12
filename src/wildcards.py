@@ -91,10 +91,6 @@ class WildcardManager:
         return results
 
 
-def wildcard_choices() -> list[str]:
-    return ["-- none --"] + get_wildcard_manager().list_names()
-
-
 def get_wildcard_manager() -> WildcardManager:
     """Build a WildcardManager that searches bundled and ComfyUI model wildcards."""
     paths: list[Path] = [BUNDLED_WILDCARDS_PATH]

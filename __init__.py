@@ -14,6 +14,7 @@ except ImportError:
     from src.nodes import NODE_CLASS_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS  # type: ignore[import-not-found]
 
 WILDCARDS_PATH = _here / "wildcards"
+WEB_DIRECTORY = "web"
 
 try:
     import folder_paths  # type: ignore[import-not-found]
@@ -23,4 +24,16 @@ try:
 except (ImportError, AttributeError):
     pass
 
-__all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS"]
+try:
+    from aiohttp.web import json_response
+    from server import PromptServer  # type: ignore[import-not-found]
+    from src.wildcards import get_wildcard_manager
+
+    @PromptServer.instance.routes.get("/dynamic_prompts/wildcards")
+    async def _list_wildcards(_request):  # type: ignore[misc]
+        return json_response(get_wildcard_manager().list_names())
+
+except (ImportError, AttributeError):
+    pass
+
+__all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS", "WEB_DIRECTORY"]

@@ -32,15 +32,3 @@ def test_empty_template() -> None:
     node = random_module.DynamicPromptRandom()
     (result,) = node.generate("", seed=0)
     assert result == ""
-
-
-def test_wildcard_append_none_sentinel() -> None:
-    node = random_module.DynamicPromptRandom()
-    (result,) = node.generate("hello", seed=0, wildcard_append="-- none --")
-    assert result == "hello"
-
-
-def test_wildcard_append_appends_syntax() -> None:
-    node = random_module.DynamicPromptRandom()
-    (result,) = node.generate("a", seed=0, wildcard_append="animals")
-    assert result in {"a cat", "a dog", "a bird"}
