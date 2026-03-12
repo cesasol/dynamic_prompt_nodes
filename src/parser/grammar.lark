@@ -51,7 +51,8 @@ option: NUMBER "::" _WS? template  -> weighted_option
 // ============================================================
 wildcard: "__" sampler_pfx? WILDCARD_PAT ("(" param_list ")")? "__"
 
-WILDCARD_PAT: /[\w\-.*\/]+/
+// Stop before __ (closing delimiter): allow _ only when not followed by another _
+WILDCARD_PAT: /(?:[^_|{}\s()]|_(?!_))+/
 
 param_list: param ("," _WS? param)*
 param: CNAME "=" param_value

@@ -116,3 +116,122 @@ def test_variant_with_whitespace():
     assert len(v.options) == 3
     # whitespace is stripped from option values
     assert v.options[0].node.parts[0].value.strip() == "summer"
+
+
+# --- Wildcards ---
+
+def test_basic_wildcard():
+    result = parse("__season__")
+    assert len(result.parts) == 1
+    w = result.parts[0]
+    assert isinstance(w, Wildcard)
+    assert w.pattern == "season"
+    assert w.sampler == "random"
+    assert w.params == {}
+
+
+def test_wildcard_glob():
+    result = parse("__colours*__")
+    w = result.parts[0]
+    assert w.pattern == "colours*"
+
+
+def test_wildcard_recursive_glob():
+    result = parse("__artists/**__")
+    w = result.parts[0]
+    assert w.pattern == "artists/**"
+
+
+def test_wildcard_random_sampler():
+    result = parse("__~colours__")
+    w = result.parts[0]
+    assert w.sampler == "random"
+
+
+def test_wildcard_cyclical_sampler():
+    result = parse("__@colours__")
+    w = result.parts[0]
+    assert w.sampler == "cyclical"
+
+
+def test_wildcard_with_params():
+    result = parse("__season_clothes(season=winter)__")
+    w = result.parts[0]
+    assert w.pattern == "season_clothes"
+    assert w.params == {"season": "winter"}
+
+
+def test_wildcard_in_text():
+    result = parse("A __season__ day")
+    assert len(result.parts) == 3
+    assert isinstance(result.parts[1], Wildcard)
+
+
+# --- Variables ---
+
+def test_variable_reference():
+    result = parse("${name}")
+    v = result.parts[0]
+    assert isinstance(v, Variable)
+    assert v.name == "name"
+    assert v.value is None
+    assert v.immediate is False
+    assert v.default is None
+
+
+def test_variable_assignment():
+    result = parse("${x=hello}")
+    v = result.parts[0]
+    assert isinstance(v, Variable)
+    assert v.name == "x"
+    assert v.value is not None
+    assert v.value.parts[0].value == "hello"
+    assert v.immediate is False
+
+
+def test_variable_immediate_assignment():
+    result = parse("${x=!hello}")
+    v = result.parts[0]
+    assert v.immediate is True
+    assert v.value is not None
+
+
+def test_variable_default():
+    result = parse("${season:summer}")
+    v = result.parts[0]
+    assert v.name == "season"
+    assert v.value is None
+    assert v.default is not None
+    assert v.default.parts[0].value == "summer"
+
+
+def test_variable_with_variant_value():
+    result = parse("${x={a|b}}")
+    v = result.parts[0]
+    assert isinstance(v, Variable)
+    assert v.value is not None
+    inner = v.value.parts[0]
+    assert isinstance(inner, Variant)
+
+
+def test_variable_reuse():
+    result = parse("${x=hello} ${x}")
+    assert len(result.parts) == 3  # assign, text " ", reference
+    assert isinstance(result.parts[0], Variable)
+    assert isinstance(result.parts[2], Variable)
+    assert result.parts[2].value is None  # reference, not assign
+
+
+# --- Comments ---
+
+def test_comment_stripped():
+    result = parse("# this is a comment\n{a|b}")
+    # comment is stripped, only variant remains
+    assert len(result.parts) == 1
+    assert isinstance(result.parts[0], Variant)
+
+
+def test_inline_comment():
+    result = parse("{a\n# comment\n|b}")
+    v = result.parts[0]
+    assert len(v.options) == 2
