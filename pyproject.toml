@@ -43,6 +43,9 @@ Tags = []
 Repository = "https://github.com/cesasol/dynamic_prompt_nodes"
 includes = ["js"]
 
+[tool.setuptools.packages.find]
+include = ["dynamic_prompt_nodes*"]
+
 [tool.setuptools.package-data]
 "*" = ["*.*"]
 
