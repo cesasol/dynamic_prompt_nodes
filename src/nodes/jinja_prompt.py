@@ -1,12 +1,9 @@
-from pathlib import Path
+from dynamicprompts.generators import JinjaGenerator
 
-from dynamicprompts.generators import RandomPromptGenerator
-from dynamicprompts.wildcards import WildcardManager
-
-WILDCARDS_PATH = Path(__file__).parent.parent / "wildcards"
+from .. import wildcards as _wildcards
 
 
-class DynamicPromptRandom:
+class DynamicPromptJinja:
     CATEGORY = "Dynamic Prompts"
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("prompt",)
@@ -28,10 +25,10 @@ class DynamicPromptRandom:
     def generate(self, template: str, seed: int) -> tuple[str]:
         if not template.strip():
             return ("",)
-        generator = RandomPromptGenerator(wildcard_manager=WildcardManager(path=WILDCARDS_PATH), seed=seed)
+        generator = JinjaGenerator(wildcard_manager=_wildcards.get_wildcard_manager())
         results = generator.generate(template)
         return (results[0] if results else "",)
 
 
-NODE_CLASS_MAPPINGS = {"DynamicPromptRandom": DynamicPromptRandom}
-NODE_DISPLAY_NAME_MAPPINGS = {"DynamicPromptRandom": "Dynamic Prompt (Random)"}
+NODE_CLASS_MAPPINGS = {"DynamicPromptJinja": DynamicPromptJinja}
+NODE_DISPLAY_NAME_MAPPINGS = {"DynamicPromptJinja": "Dynamic Prompt (Jinja2)"}

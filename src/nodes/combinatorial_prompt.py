@@ -1,9 +1,6 @@
-from pathlib import Path
-
 from dynamicprompts.generators import CombinatorialPromptGenerator
-from dynamicprompts.wildcards import WildcardManager
 
-WILDCARDS_PATH = Path(__file__).parent.parent / "wildcards"
+from .. import wildcards as _wildcards
 
 
 class DynamicPromptCombinatorial:
@@ -25,7 +22,7 @@ class DynamicPromptCombinatorial:
     def generate(self, template: str, index: int) -> tuple[str, list[str], int]:
         if not template.strip():
             return ("", [], 0)
-        generator = CombinatorialPromptGenerator(wildcard_manager=WildcardManager(path=WILDCARDS_PATH))
+        generator = CombinatorialPromptGenerator(wildcard_manager=_wildcards.get_wildcard_manager())
         results = generator.generate(template)
         if not results:
             return ("", [], 0)

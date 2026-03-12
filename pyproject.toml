@@ -66,7 +66,7 @@ warn_no_return = true
 [[tool.mypy.overrides]]
 # Don't require test functions to include types
 module = "tests.*"
-allow_untyped_defs = true
+disallow_untyped_defs = false
 disable_error_code = "attr-defined"
 
 [tool.ruff]
