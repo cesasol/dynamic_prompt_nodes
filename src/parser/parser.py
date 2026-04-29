@@ -11,6 +11,11 @@ from src.parser.ast_nodes import (
     WeightedOption,
     Wildcard,
     Variable,
+    PPPSet,
+    PPPEcho,
+    PPPIf,
+    PPPSendToNegative,
+    PPPExtraNetwork,
 )
 
 _GRAMMAR = (Path(__file__).parent / "grammar.lark").read_text()
@@ -32,7 +37,7 @@ class _Transformer(Transformer):  # type: ignore[type-arg]
         return result
 
     def template(self, items: list[Any]) -> Template:
-        parts: list[Text | Variant | Wildcard | Variable] = []
+        parts: list[Text | Variant | Wildcard | Variable | PPPSet | PPPEcho | PPPIf | PPPSendToNegative | PPPExtraNetwork] = []
         for item in items:
             if item is None:
                 continue
@@ -165,6 +170,123 @@ class _Transformer(Transformer):  # type: ignore[type-arg]
 
     def var_assign_imm(self, items: list[Any]) -> Variable:
         return Variable(name=str(items[0]), value=items[1], immediate=True, default=None)
+
+    def ppp_set(self, items: list[Any]) -> PPPSet:
+        params = str(items[0]).strip()
+        parts = params.split()
+        var_name = parts[0] if parts else ""
+        modifiers = parts[1:] if len(parts) > 1 else []
+        content: Template = items[1]
+        return PPPSet(var_name=var_name, modifiers=modifiers, content=content)
+
+    def ppp_echo(self, items: list[Any]) -> PPPEcho:
+        params = str(items[0]).strip()
+        parts = params.split()
+        var_name = parts[0] if parts else ""
+        default: Template | None = items[1] if len(items) > 1 else None
+        return PPPEcho(var_name=var_name, default=default)
+
+    def ppp_if(self, items: list[Any]) -> PPPIf:
+        branches: list[tuple[str, Template]] = []
+        else_content: Template | None = None
+
+        condition = str(items[0]).strip()
+        branches.append((condition, items[1]))
+
+        remaining = len(items) - 2
+        if remaining % 2 == 1:
+            else_content = items[-1]
+            remaining -= 1
+
+        idx = 2
+        while remaining > 0:
+            branches.append((str(items[idx]).strip(), items[idx + 1]))
+            idx += 2
+            remaining -= 2
+
+        return PPPIf(branches=branches, else_content=else_content)
+
+    def ppp_stn(self, items: list[Any]) -> PPPSendToNegative:
+        if len(items) == 0:
+            return PPPSendToNegative(position=None, content=None, is_insertion_point=True)
+        if isinstance(items[0], Template):
+            return PPPSendToNegative(position=None, content=items[0], is_insertion_point=False)
+        if len(items) == 1:
+            return PPPSendToNegative(
+                position=str(items[0]).strip() or None,
+                content=None,
+                is_insertion_point=True,
+            )
+        return PPPSendToNegative(
+            position=str(items[0]).strip() or None,
+            content=items[1],
+            is_insertion_point=False,
+        )
+
+    def ppp_ext(self, items: list[Any]) -> PPPExtraNetwork:
+        params = str(items[0]).strip()
+        ext_type, name, weight, condition, is_mapping = _parse_ext_params(params)
+        triggers: Template | None = items[1] if len(items) > 1 else None
+        return PPPExtraNetwork(
+            ext_type=ext_type,
+            name=name,
+            weight=weight,
+            condition=condition,
+            triggers=triggers,
+            is_mapping=is_mapping,
+        )
+
+    def ppp_params(self, items: list[Any]) -> str:
+        return str(items[0])
+
+
+def _parse_ext_params(params: str) -> tuple[str, str, str | None, str | None, bool]:
+    tokens = _tokenize_quoted(params)
+    if not tokens:
+        return "", "", None, None, False
+    ext_type = tokens[0]
+    is_mapping = ext_type.startswith("$")
+    if is_mapping:
+        ext_type = ext_type[1:]
+    if len(tokens) < 2:
+        return ext_type, "", None, None, is_mapping
+    name = tokens[1]
+    if len(tokens) == 2:
+        return ext_type, name, None, None, is_mapping
+    if "if" in tokens[2:]:
+        if_idx = tokens.index("if", 2)
+        weight = " ".join(tokens[2:if_idx]) if if_idx > 2 else None
+        condition = " ".join(tokens[if_idx + 1 :])
+        return ext_type, name, weight or None, condition or None, is_mapping
+    weight = " ".join(tokens[2:])
+    return ext_type, name, weight or None, None, is_mapping
+
+
+def _tokenize_quoted(text: str) -> list[str]:
+    tokens: list[str] = []
+    i = 0
+    while i < len(text):
+        if text[i] in " \t\n":
+            i += 1
+            continue
+        if text[i] in "\"'":
+            quote = text[i]
+            i += 1
+            start = i
+            while i < len(text) and text[i] != quote:
+                if text[i] == "\\" and i + 1 < len(text):
+                    i += 2
+                else:
+                    i += 1
+            tokens.append(text[start:i])
+            if i < len(text) and text[i] == quote:
+                i += 1
+        else:
+            start = i
+            while i < len(text) and text[i] not in " \t\n\"'":
+                i += 1
+            tokens.append(text[start:i])
+    return tokens
 
 
 class _SamplerMarker:

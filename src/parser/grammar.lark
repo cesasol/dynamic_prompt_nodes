@@ -10,11 +10,13 @@ template: part*
      | variant
      | wildcard
      | variable
+     | ppp_tag
 
 // Plain text: any character that doesn't start a special construct.
 // Single _ is fine; __ starts a wildcard. Single $ is fine; ${ starts a variable.
+// <ppp: and </ppp: start PPP tags.
 // | excluded globally (variant separator); {}_$# also excluded.
-TEXT: /(?:_(?!_)|\$(?!\{)|[^{}_$#|])+/
+TEXT: /(?:_(?!_)|\$(?!\{)|[^{}_$#|<]|<(?!\/?ppp:))+/
 
 // Comments: # to end of line, stripped from output
 comment: /#[^\n]*\n?/
@@ -69,6 +71,26 @@ variable: "${" CNAME "}"                           -> var_ref
         | "${" CNAME ":" template "}"              -> var_ref_default
         | "${" CNAME "=" "!" template "}"          -> var_assign_imm
         | "${" CNAME "=" template "}"              -> var_assign
+
+// ============================================================
+// PPP TAGS: <ppp:set>, <ppp:echo>, <ppp:if>, <ppp:stn>, <ppp:ext>
+// ============================================================
+?ppp_tag: ppp_set | ppp_echo | ppp_if | ppp_stn | ppp_ext
+
+ppp_set: "<ppp:set" ppp_params ">" template "<ppp:/set>"
+
+ppp_echo: "<ppp:echo" ppp_params "/>"
+        | "<ppp:echo" ppp_params ">" template "<ppp:/echo>"
+
+ppp_if: "<ppp:if" ppp_params ">" template ("<ppp:elif" ppp_params ">" template)* ("<ppp:else>" template)? "<ppp:/if>"
+
+ppp_stn: "<ppp:stn" _WS? ppp_params? ">" template "<ppp:/stn>"
+        | "<ppp:stn" _WS? ppp_params? "/>"
+
+ppp_ext: "<ppp:ext" ppp_params ">" template "<ppp:/ext>"
+        | "<ppp:ext" ppp_params "/>"
+
+ppp_params: /[^>\x2F]+/
 
 // Whitespace (at least one; use _WS? in rules to make optional)
 _WS: /[ \t\n]+/
